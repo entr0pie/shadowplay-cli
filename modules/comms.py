@@ -3,6 +3,11 @@
 from subprocess import Popen, PIPE
 import socket
 import hashlib
+from datetime import datetime
+
+from modules.colors import Colors
+
+c = Colors()
 
 def is_alive(ADDRESS: str) -> bool:
     process = Popen(["ping", "-c1", ADDRESS], stdout=PIPE, stderr=PIPE) 
@@ -96,10 +101,13 @@ def connect_session(SRV_ADDRESS: str, SRV_PORT: int, ADDRESS: str, PORT: int, TO
         print("Failed to connect on shell.")
         return None
 
-    print(f"Logged on {ADDRESS}:{PORT}\n")
+    now = datetime.now()
+    clock = now.strftime("%H:%M:%S")
+
+    print(f"\n** ({clock}) Connected on {c.blue}{ADDRESS}:{PORT}{c.reset} **\n")
 
     while True:
-        command = input("$ ").strip()
+        command = input(f"{c.ok}(shell / {ADDRESS}){c.reset} > ").strip()
         
         if command == "exit": 
             client.send(b"EXIT")
