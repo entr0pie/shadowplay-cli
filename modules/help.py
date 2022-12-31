@@ -6,7 +6,7 @@ def print_help():
     text += "=======               ===========\n"
     text += " help / ?             show this text\n"
     text += " sessions             get available machines\n"
-    text += " connect <id>         connect to a machine\n" 
-    text += "\n"
+    text += " whois <id>           get shell info\n"
+    text += " connect <id>         connect to shell\n" 
     
     print(text)
