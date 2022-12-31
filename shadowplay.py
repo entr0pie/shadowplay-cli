@@ -85,8 +85,10 @@ while True:
                 port = int(port)
 
             except ValueError:
-                print('Usage: connect <ip>:<port>\n')
-                continue
+                sessions = open('sessions.tmp', 'r').readlines()
+                index = int(addr)
+                ip, port = sessions[index].strip().split(':')
+                port = int(port)
 
             connect_session(ADDRESS, PORT, ip, port, TOKEN)
 

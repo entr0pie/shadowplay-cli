@@ -38,7 +38,7 @@ These topics are under development:
 
 - [X] Create basic connections and protocols srv-cli.
 - [X] Implementing MD5 and TOKEN session methods.
-- [ ] Connecting to shell via ID.
+- [X] Connecting to shell via ID.
 - [ ] Error handling on connections and methods. 
 - [ ] Use end-to-end cryptography on cli-srv communications.
 - [ ] GET INFO function on the cli (get server and shell's basic information).
